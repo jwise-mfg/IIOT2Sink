@@ -15,7 +15,7 @@ mqtt_broker = "192.168.10.5"			#Address of the MQTT Broker
 mqtt_client = "MqttClientToServer"
 mqtt_subscriptions = []
 sub = subscription()
-sub.topic = "test/jon"
+sub.topic = "energy/growatt"
 sub.member = "values.batterySoc"
 sub.sink = "log"
 #TODO: Make sinks extensible
