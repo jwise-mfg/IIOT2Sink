@@ -14,16 +14,24 @@ class subscription():
 mqtt_broker = "192.168.10.5"			#Address of the MQTT Broker
 mqtt_client = "MqttClientToServer"
 mqtt_subscriptions = []
-sub = subscription()
-sub.topic = "energy/growatt"
-sub.member = "values.batterySoc"
-sub.sink = "log"
+
+#TODO: Load from a Subscriptions Config file
+sub1 = subscription()
+sub1.topic = "energy/growatt"
+sub1.member = "values.batterySoc"
+sub1.sink = "log"
+mqtt_subscriptions.append(sub1)
+
+sub2 = subscription()
+sub2.topic = "gateway/34:94:54:C8:4C:40/sensor/00:13:A2:00:41:FA:EF:FB"
+sub2.member = "00:13:A2:00:41:FA:EF:FB.temperature"
+sub2.sink = "log"
+mqtt_subscriptions.append(sub2)
 #TODO: Make sinks extensible
 #sub.sink = "database"
 #sub.command = "insert into tbl_values (batterySoc) values (%value%)"
 #sub.sink = "graphql"
 #etc...
-mqtt_subscriptions.append(sub)
 
 def make_datetime_utc():
 	return datetime.now(timezone.utc).replace(tzinfo=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ') 
@@ -41,6 +49,7 @@ def on_message(client, userdata, message):
 			member = sub.member
 			sink = sub.sink
 			command = sub.command
+			topic = sub.topic
 
 	if member == None:
 		print ("No message member defined, using raw value")
@@ -60,9 +69,9 @@ def on_message(client, userdata, message):
 
 	print ("Using sink: ", sink)
 	if sink == "log":
-		with open('log.txt', 'a') as f:
-			print ("Writing to log.txt: ", str(value))
-			f.write(make_datetime_utc() + " - " + str(value) + "\r\n")
+		with open('mqtt_log.csv', 'a') as f:
+			print ("Writing to mqtt_log.csv: ", str(value))
+			f.write(make_datetime_utc() + "," + topic + "," + str(value) + "\r\n")
 	if sink == "database":
 		if command != None:
 			command = command.replace("%value%", str(value))
