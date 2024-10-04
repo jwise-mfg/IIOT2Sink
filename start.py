@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 import requests
 import json
@@ -21,15 +21,12 @@ sub.sink = "log"
 #TODO: Make sinks extensible
 #sub.sink = "database"
 #sub.command = "insert into tbl_values (batterySoc) values (%value%)"
+#sub.sink = "graphql"
+#etc...
 mqtt_subscriptions.append(sub)
 
 def make_datetime_utc():
-	utc_time = str(datetime.utcnow())
-	time_parts = utc_time.split(" ")
-	utc_time = "T".join(time_parts)
-	time_parts = utc_time.split(".")
-	utc_time = time_parts[0] + "Z"
-	return utc_time
+	return datetime.now(timezone.utc).replace(tzinfo=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ') 
 
 def search_json(data, member):
 	for key, value in data.items():
@@ -46,22 +43,26 @@ def on_message(client, userdata, message):
 			command = sub.command
 
 	if member == None:
-		print ("Could not find message member, using raw value")
+		print ("No message member defined, using raw value")
+		value = msg
+	if member == "":
+		print ("No message member defined, using raw value")
 		value = msg
 	else:
 		print ("Searching for JSON payload member: " + member)
 		data = json.loads(msg)
-		parse_members = member.split(".")
-		for member in parse_members:
+		#TODO: error handling
+		member_parts = member.split(".")
+		for member in member_parts:
 			data = search_json(data, member)
 		value = data
-		print ("Value:", value)
+		print ("Using discovered value:", value)
 
 	print ("Using sink: ", sink)
 	if sink == "log":
 		with open('log.txt', 'a') as f:
-			print ("Writing to log.txt", str(value))
-			f.write(str(value) + "\r\n")
+			print ("Writing to log.txt: ", str(value))
+			f.write(make_datetime_utc() + " - " + str(value) + "\r\n")
 	if sink == "database":
 		if command != None:
 			command = command.replace("%value%", str(value))
