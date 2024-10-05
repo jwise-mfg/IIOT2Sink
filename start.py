@@ -77,7 +77,7 @@ def on_message(client, userdata, message):
 			command = command.replace("%value%", str(value))
 			print ("Using command: ", command)
 
-client = mqtt.Client(mqtt_client)
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, mqtt_client)
 client.connect(mqtt_broker)
 for sub in mqtt_subscriptions:
 	print("subscribing to: " + sub.topic)
