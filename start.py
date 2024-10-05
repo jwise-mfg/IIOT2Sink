@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import paho.mqtt
 import paho.mqtt.client as mqtt
 import requests
 import json
@@ -77,10 +78,15 @@ def on_message(client, userdata, message):
 			command = command.replace("%value%", str(value))
 			print ("Using command: ", command)
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, mqtt_client)
+print("Using paho-mqtt version: ", paho.mqtt.__version__)
+if paho.mqtt.__version__[0] > '1':
+    client = mqtt.Client(mqttClient.CallbackAPIVersion.VERSION1, mqtt_client)
+else:
+    client = mqtt.Client(mqtt_client)
+
 client.connect(mqtt_broker)
 for sub in mqtt_subscriptions:
-	print("subscribing to: " + sub.topic)
+	print("subscribing to: ", sub.topic)
 	client.subscribe(str(sub.topic))
 client.on_message=on_message
 client.loop_forever()
