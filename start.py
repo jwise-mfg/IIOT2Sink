@@ -86,7 +86,7 @@ def on_message(client, userdata, message):
 
 print("Using paho-mqtt version: ", paho.mqtt.__version__)
 if paho.mqtt.__version__[0] > '1':
-    client = mqtt.Client(mqttClient.CallbackAPIVersion.VERSION1, mqtt_client)
+    client = mqtt.Client(mqtt.Client.CallbackAPIVersion.VERSION1, mqtt_client)
 else:
     client = mqtt.Client(mqtt_client)
 
