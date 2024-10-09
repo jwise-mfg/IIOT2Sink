@@ -18,10 +18,8 @@ class subscription():
         self.sink = None
         self.command = None
 
-#TODO: Load from a Config File
 mqtt_broker = config.mqtt["broker"]
 mqtt_client = config.mqtt["clientid"] + f'{random.randint(0, 1000)}'
-#TODO: Load from a Subscriptions Config file
 mqtt_subscriptions = config.subscriptions
 
 def make_datetime_utc():
