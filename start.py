@@ -4,6 +4,14 @@ import paho.mqtt.client as mqtt
 import requests
 import json
 import random
+import os
+from pprint import pprint
+from sinks import sinkadapters
+
+if __name__ == '__main__':
+	for p in sinkadapters.sinks:
+		inst = p()
+		inst.start()
 
 class subscription():
 	def __init__(self):
@@ -21,21 +29,16 @@ mqtt_subscriptions = []
 sub1 = subscription()
 sub1.topic = "energy/growatt"
 sub1.member = "values.batterySoc"
-sub1.sink = "log"
+sub1.sink = "log2csv"
 sub1.label = "Solar Battery %"
 mqtt_subscriptions.append(sub1)
 
 sub2 = subscription()
 sub2.topic = "gateway/34:94:54:C8:4C:40/sensor/00:13:A2:00:41:FA:EF:FB"
 sub2.member = "00:13:A2:00:41:FA:EF:FB.temperature"
-sub2.sink = "log"
+sub2.sink = ["log2csv","sql"]
 sub2.label = "Solar Shed Temp"
 mqtt_subscriptions.append(sub2)
-#TODO: Make sinks extensible
-#sub.sink = "database"
-#sub.command = "insert into tbl_values (batterySoc) values (%value%)"
-#sub.sink = "graphql"
-#etc...
 
 def make_datetime_utc():
 	return datetime.now(timezone.utc).replace(tzinfo=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ') 
@@ -48,41 +51,38 @@ def search_json(data, member):
 def on_message(client, userdata, message):
 	msg = str(message.payload.decode("utf-8"))
 	print("Received MQTT message: ", msg)
+	# Check if there's sink configuration
 	for sub in mqtt_subscriptions:
 		if sub.topic == message.topic:
-			member = sub.member
-			sink = sub.sink
-			command = sub.command
-			topic = sub.topic
-			label = sub.topic
-			if sub.label != None:
-				label = sub.label
-
-	if member == None:
-		print ("No message member defined, using raw value")
-		value = msg
-	if member == "":
+			msg_sub = sub
+			if msg_sub.label == None:
+				msg_sub.label = msg_sub.topic
+	if msg_sub.member == None or msg_sub.member == "":
 		print ("No message member defined, using raw value")
 		value = msg
 	else:
-		print ("Searching for JSON payload member: " + member)
+		# Check if the payload contains the configured member and parse out its avlue
+		print ("Searching for JSON payload member: " + msg_sub.member)
 		data = json.loads(msg)
 		#TODO: error handling
-		member_parts = member.split(".")
+		member_parts = msg_sub.member.split(".")
 		for member in member_parts:
 			data = search_json(data, member)
 		value = data
 		print ("Using discovered value:", value)
 
-	print ("Using sink: ", sink)
-	if sink == "log":
-		with open('mqtt_log.csv', 'a') as f:
-			print ("Writing to mqtt_log.csv: ", str(value))
-			f.write(make_datetime_utc() + "," + label + "," + str(value) + "\r\n")
-	if sink == "database":
-		if command != None:
-			command = command.replace("%value%", str(value))
-			print ("Using command: ", command)
+	# Check if we have a place to send the data
+	if isinstance(msg_sub.sink, list):
+		print ("using multiple sinks:", json.dumps(msg_sub.sink))
+	else:
+		print ("Using sink: ", msg_sub.sink)
+	
+	# Check if that requested sink adapter exists and write to it
+	for config_sink in msg_sub.sink:
+		for sink in sinkadapters.sinks:
+			if sink.name.lower() == config_sink.lower():
+				print ("sending to sink", sink.name)
+				sink.write(make_datetime_utc(), value, msg_sub)
 
 print("Using paho-mqtt version: ", paho.mqtt.__version__)
 if paho.mqtt.__version__[0] > '1':
