@@ -1,10 +1,11 @@
 import os
 import traceback
 from importlib import util
+from abc import ABC, abstractmethod
 # Adapted from: https://gist.github.com/dorneanu/cce1cd6711969d581873a88e0257e312
 
 class sinkadapters:
-    #Base sink adapter resource class. Concrete resources will inherit from this one
+    # Base sink adapter resource class. Concrete resources will inherit from this one
     sinks = []
 
     # For every class that inherits from the current,
@@ -13,11 +14,22 @@ class sinkadapters:
         super().__init_subclass__(**kwargs)
         cls.sinks.append(cls)
 
+    # Define the interface for an adapter
+    @abstractmethod
+    def start():
+        pass
+
+    @abstractmethod
+    def write(timestamp, value, subscription):
+        pass
+
+# Load adapters
+
 # Get current path
 path = os.path.abspath(__file__)
 dirpath = os.path.dirname(path)
 
-# Small utility to automatically load modules
+# Module Loader
 def load_module(path):
     spec = util.spec_from_file_location("__init__.py", path)
     module = util.module_from_spec(spec)
