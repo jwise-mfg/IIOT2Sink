@@ -8,11 +8,12 @@ class sinkadapters:
     # Base sink adapter resource class. Concrete resources will inherit from this one
     sinks = []
 
-    # For every class that inherits from the current,
+    # For every class that inherits from the current, and has an init
     # the class name will be added to sink adapters
     def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.sinks.append(cls)
+        if "__init__" in str(cls):
+            super().__init_subclass__(**kwargs)
+            cls.sinks.append(cls)
 
     # Define the interface for an adapter
     @abstractmethod
