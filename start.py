@@ -16,6 +16,7 @@ class subscription():
         self.topic = None
         self.member = None
         self.sink = None
+        self.label = None
         self.command = None
 
 mqtt_broker = config.mqtt["broker"]
@@ -38,8 +39,10 @@ def on_message(client, userdata, message):
     for sub in mqtt_subscriptions:
         if sub["topic"] == message.topic:
             msg_sub = sub
+            # Make sure there's a label, default to topic name
             if msg_sub["label"] == None:
                 msg_sub["label"] = msg_sub["topic"]
+    # Figure out what kind of value to extract
     if msg_sub["member"] == None or msg_sub["member"] == "":
         print ("No message member defined, using raw value")
         value = msg

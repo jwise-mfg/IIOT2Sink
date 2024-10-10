@@ -1,0 +1,1 @@
+Requires `pip install mysql-connector` or `apt install python3-mysql.connector`
