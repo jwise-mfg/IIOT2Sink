@@ -37,10 +37,10 @@ def load_module(path):
     spec.loader.exec_module(module)
     return module
 
-# Loop through each subfolder and try to load if it looks like a real adapter
+# Loop through each subfolder and try to load if it looks like a real adapter and has a config
 for fname in os.listdir(dirpath):
     sinkpath = os.path.join(dirpath, fname)
-    if os.path.isdir(sinkpath) and "__init__.py" in os.listdir(sinkpath):
+    if os.path.isdir(sinkpath) and "__init__.py" in os.listdir(sinkpath) and "config.py" in os.listdir(sinkpath):
         try:
             module = load_module(os.path.join(sinkpath, "__init__.py"))
         except Exception:
