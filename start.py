@@ -67,8 +67,11 @@ def on_message(client, userdata, message):
         print ("Using sink: ", msg_sub["sink"])
     
     # Check if that requested sink adapter exists and write to it
+    config_sinks = msg_sub["sink"]
+    if not isinstance(config_sinks, list):
+        config_sinks = [msg_sub["sink"]]
     i = 0
-    for config_sink in msg_sub["sink"]:
+    for config_sink in config_sinks:
         for sink in sinkadapters.sinks:
             if sink.name.lower() == config_sink.lower():
                 sinkparam = msg_sub["sinkparam"]
