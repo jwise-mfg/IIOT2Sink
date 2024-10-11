@@ -17,7 +17,7 @@ class subscription():
         self.member = None
         self.sink = None
         self.label = None
-        self.command = None
+        self.sinkargs = None
 
 mqtt_broker = config.mqtt["broker"]
 mqtt_client = config.mqtt["clientid"] + f'{random.randint(0, 1000)}'
@@ -42,6 +42,7 @@ def on_message(client, userdata, message):
             # Make sure there's a label, default to topic name
             if msg_sub["label"] == None:
                 msg_sub["label"] = msg_sub["topic"]
+
     # Figure out what kind of value to extract
     if msg_sub["member"] == None or msg_sub["member"] == "":
         print ("No message member defined, using raw value")
@@ -57,6 +58,8 @@ def on_message(client, userdata, message):
         value = data
         print ("Discovered value:", value)
 
+    # TODO: option to not post duplicate values
+
     # Check if we have a place to send the data
     if isinstance(msg_sub["sink"], list):
         print ("Using multiple sinks:", json.dumps(msg_sub["sink"]))
@@ -64,11 +67,16 @@ def on_message(client, userdata, message):
         print ("Using sink: ", msg_sub["sink"])
     
     # Check if that requested sink adapter exists and write to it
+    i = 0
     for config_sink in msg_sub["sink"]:
         for sink in sinkadapters.sinks:
             if sink.name.lower() == config_sink.lower():
-                print (f"Sending {value} to {sink.name}")
-                sink.write(sink, make_datetime_utc(), value, msg_sub)
+                sinkparam = msg_sub["sinkparam"]
+                if isinstance(sinkparam, list):
+                    sinkparam = sinkparam[i]
+                print (f"Sending {value} to {sink.name} with params: {sinkparam}")
+                sink.write(sink, make_datetime_utc(), value, sinkparam, msg_sub)
+        i = i + 1
     print("=== Done processing message")
 
 print(f"Connecting paho-mqtt version: {paho.mqtt.__version__} with client id {mqtt_client}")

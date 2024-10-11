@@ -21,7 +21,7 @@ class sinkadapters:
         pass
 
     @abstractmethod
-    def write(timestamp, value, subscription):
+    def write(timestamp, value, sinkparam, subscription):
         pass
 
 # Load adapters

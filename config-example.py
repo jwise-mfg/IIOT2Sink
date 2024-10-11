@@ -17,6 +17,6 @@ subscriptions = [
         "member": "00:13:A2:00:41:FA:EF:FB.temperature",
         "sink": ["log2csv", "mysqlsink"],
         "label": "Solar Shed Temp",
-        "command": "insert into tag_samples (timestamp, value, label) values (%s, %s, %s)"
+        "sinkparam": "insert into tag_samples (timestamp, value, label) values (%s, %s, %s)"
     },
 ]

@@ -19,8 +19,8 @@ class mysqlsink(sinks.sinkadapters):
     def start(self):
         print(f"Starting {self.name} using database: {self.host}.{self.database}")
 
-    def write(self, timestamp, value, subscription):
-        if subscription["command"] != None and subscription["command"] != "":
+    def write(self, timestamp, value, sinkparam, subscription):
+        if subscription["sinkparam"] != None and subscription["sinkparam"] != "":
             dbconn = mysql.connector.connect(
                 host=self.host,
                 database=self.database,
@@ -31,8 +31,10 @@ class mysqlsink(sinks.sinkadapters):
             ts = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
             dbcursor = dbconn.cursor()
-            sqlcmd = subscription["command"]
+            sqlcmd = sinkparam
             sqlval = (ts, value, subscription["label"])
             dbcursor.execute(sqlcmd, sqlval)
             dbconn.commit()
             print(f"Inserted into {self.database}: {value}")
+        else:
+            print(f"{self.name} invoked without parameters. Nothing to do!")
