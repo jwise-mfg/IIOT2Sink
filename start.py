@@ -92,5 +92,6 @@ client.connect(mqtt_broker)
 for sub in mqtt_subscriptions:
     print("Subscribing to: ", sub["topic"])
     client.subscribe(str(sub["topic"]))
+    print("Awaiting messages...")
 client.on_message=on_message
 client.loop_forever()
