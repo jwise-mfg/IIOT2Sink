@@ -5,6 +5,8 @@ if [ "$EUID" -ne 0 ]
 fi
 
 installservice() {
+    #TODO Check pre-conditions (configs, python3, etc...)
+    
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     echo This will install a systemd service for this script using $SCRIPT_DIR. 
     read -p "Do you want to proceed (Y/N)? " -n 1 -r
