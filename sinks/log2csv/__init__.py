@@ -1,13 +1,19 @@
 import sinks
 import os
-from sinks.log2csv import config
+import yaml
 
 class log2csv(sinks.sinkadapters):
 
+    # Load config
+    # TODO: It would be nice if this could be passed into the sink constructor somehow...
+    with open('config.yml', 'r') as file:
+        config = yaml.safe_load(file)
+
     name = "log2csv"
-    logpath = config.logfile["path"]
-    maxsize = config.logfile["maxsize"]
-    maxflush = config.logfile["flushonmax"]
+    logpath = config['sinks']['log2csv']['path']
+    maxsize = config['sinks']['log2csv']['maxsize']
+    maxflush = config['sinks']['log2csv']['flushonmax']
+
     def __init__(self):
         pass
 

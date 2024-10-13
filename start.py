@@ -3,14 +3,22 @@ import paho.mqtt
 import paho.mqtt.client as mqtt
 import json
 import random
-import config
+import yaml
 from sinks import sinkadapters
 
+# Load config
+with open('config.yml', 'r') as file:
+    config = yaml.safe_load(file)
+
+# Load sink adapters
+print("Loading sinks...")
 if __name__ == '__main__':
     for p in sinkadapters.sinks:
         inst = p()
+        print('-', end='')
         inst.start()
 
+# Define a subscription
 class subscription():
     def __init__(self):
         self.topic = None
@@ -19,9 +27,8 @@ class subscription():
         self.label = None
         self.sinkargs = None
 
-mqtt_broker = config.mqtt["broker"]
-mqtt_client = config.mqtt["clientid"] + f'{random.randint(0, 1000)}'
-mqtt_subscriptions = config.subscriptions
+# Remember all subscriptions
+mqtt_subscriptions = config['mqtt']['subscriptions']
 
 def make_datetime_utc():
     return datetime.now(timezone.utc).replace(tzinfo=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ') 
@@ -31,6 +38,7 @@ def search_json(data, member):
         if key == member:
             return value
 
+# Main MQTT message handling
 def on_message(client, userdata, message):
     msg = str(message.payload.decode("utf-8"))
     print(f"=== Received MQTT message at {make_datetime_utc()}")
@@ -82,16 +90,16 @@ def on_message(client, userdata, message):
         i = i + 1
     print("=== Done processing message")
 
-print(f"Connecting paho-mqtt version: {paho.mqtt.__version__} with client id {mqtt_client}")
+# Connect to MQTT Broker (handle different library versions)
+print(f"Connecting paho-mqtt version: {paho.mqtt.__version__} with client id {config['mqtt']['clientid']}")
 if paho.mqtt.__version__[0] > '1':
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, mqtt_client)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, config['mqtt']['clientid'])
 else:
-    client = mqtt.Client(mqtt_client)
-
-client.connect(mqtt_broker)
+    client = mqtt.Client(config['mqtt']['clientid'])
+client.connect(config['mqtt']['broker'], config['mqtt']['port'])
 for sub in mqtt_subscriptions:
-    print("Subscribing to: ", sub["topic"])
+    print("-Subscribing to:", sub["topic"])
     client.subscribe(str(sub["topic"]))
-    print("Awaiting messages...")
+print("Awaiting messages...")
 client.on_message=on_message
 client.loop_forever()

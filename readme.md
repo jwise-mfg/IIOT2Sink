@@ -1,0 +1,11 @@
+- Create a python3 virtual environment in this folder: `python3 -m venv .`
+- Activate the environment: `source bin/activate`
+- Install the dependencies (including dependencies for any sinks you wish to use):
+    - `pip install paho-mqtt`
+    - `pip install pyyaml`
+    - mysqlsink
+        - `pip install mysql-connector`
+    - smipgraphql
+        - `pip install requests`
+- Start by executing the start.sh script OR
+- Start by activiating the environment (see above) and running `python3 start.py`

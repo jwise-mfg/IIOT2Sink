@@ -9,6 +9,7 @@ installservice() {
     
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     echo This will install a systemd service for this script using $SCRIPT_DIR. 
+    echo You should ensure everything starts by running start.sh manually before installation.
     read -p "Do you want to proceed (Y/N)? " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Nn]$ ]]

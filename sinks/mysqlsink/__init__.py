@@ -1,17 +1,22 @@
 import sinks
+import yaml
 import mysql
 import mysql.connector
 from datetime import datetime
 import calendar
-from sinks.mysqlsink import config
 
 class mysqlsink(sinks.sinkadapters):
 
+    # Load config
+    # TODO: It would be nice if this could be passed into the sink constructor somehow...
+    with open('config.yml', 'r') as file:
+        config = yaml.safe_load(file)
+
     name = "mysqlsink"
-    host = config.database["host"]
-    database = config.database["database"]
-    dbuser = config.database["user"]
-    dbpass = config.database["password"]
+    host = config['sinks']['mysqlsink']['host']
+    database = config['sinks']['mysqlsink']['database']
+    dbuser = config['sinks']['mysqlsink']['user']
+    dbpass = config['sinks']['mysqlsink']['password']
 
     def __init__(self):
         pass

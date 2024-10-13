@@ -1,0 +1,53 @@
+# This is an example config file. It cannot be used directly.
+# Copy this file config.yml and make the changes necessary for your environment.
+# If you omit a sink, it will not be loaded.
+mqtt:
+  broker: "192.168.10.5"
+  port: 1883
+  username:
+  password:
+  clientid: "mqtt2sink"
+  # Here you define the MQTT Topics you want to subscribe to, and the sinks you want them to go to
+  # You can also configure how to parse a JSON payload to extract the value for a single member
+  subscriptions:
+    # This is a simple subscription that logs the entire payload to a text file
+    - topic: "energy/storage"
+      member: ""
+      label: "Battery %"
+      sink: "log2csv"
+    # This is a more complex subscription that parses a member of a payload to a database
+    # The optional sinkparam includes the database insert command, which can be customized
+    # An example of a table compatible with this database command can be found in sinks/mysqlsink/readme.md
+    - topic: "energy/storage"
+      member: "values.batterySoc"
+      label: "Battery %"
+      sink: "mysqlsink"
+      sinkparam: "insert into tag_samples (timestamp, value, label) values (%s, %s, %s)"
+    # This is a complex subscription that parses a member of a payload and sends it to multiple sinks
+    # Sinks there are an array of sinks, there is also an array of sinkparams
+    #   The first empty string means no param is needed
+    #   The second string is the command for the second sink: a database insert
+    #   The third sinkparam is an ID used for a mutation into the CESMII SMIP/ThinkIQ
+    - topic: "gateway/34:94:54:C8:4C:40/sensor/00:13:A2:00:41:FA:EF:FB"
+      member: "00:13:A2:00:41:FA:EF:FB.temperature"
+      label: "Ambient Temperature"
+      sink: ["log2csv", "mysqlsink", "smipgraphql"]
+      sinkparam: ["","insert into tag_samples (timestamp, value, label) values (%s, %s, %s)", 145402]
+# Each sink is a place that data can go. Each will have its own configuration needs.
+sinks:
+  log2csv:
+    path: "./mqtt_log.csv"
+    maxsize: 2000000
+    flushonmax: True
+  mysqlsink:
+    host: "localhost"
+    database: "YOURDB"
+    user: "YOURDBUSER"
+    password: "YOURDBPASSWORD"
+  smip:
+    url: "https://<YOURINSTANCE>.cesmii.net/graphql"
+    authenticator: "YOUR AUTHENTICATOR"
+    role: "<YOUR>_group"
+    password: "YOUR AUTHENTICATOR PASSWORD"
+    username: "YOUR USERNAME"
+    batchuntil: 10
