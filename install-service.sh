@@ -18,7 +18,7 @@ installservice() {
         exit 0
     fi
 
-    UNIT_PATH=/etc/systemd/system/mqtt-to-sink
+    UNIT_PATH=/etc/systemd/system/iiot-to-sink
     if [ -f "$UNIT_PATH"".service" ]; then
         echo Service already installed!
         echo Remove with --remove-service
@@ -27,7 +27,7 @@ installservice() {
     if [ $(which systemctl) ]; then
         # Create the Service
         echo "[Unit]" > "$UNIT_PATH"".service"
-        echo "Description=MQTT to Sink Service" >> "$UNIT_PATH"".service"
+        echo "Description=IIOT to Sink Service" >> "$UNIT_PATH"".service"
         echo "Wants = network-online.target" >> "$UNIT_PATH"".service"
         echo "After = network.target network-online.target" >> "$UNIT_PATH"".service"
         echo "" >> "$UNIT_PATH"".service"
@@ -39,9 +39,12 @@ installservice() {
         echo "WantedBy=multi-user.target" >> "$UNIT_PATH"".service"
         # Install
         systemctl daemon-reload
-        systemctl enable mqtt-to-sink.service
-        systemctl start mqtt-to-sink.service
+        systemctl enable iiot-to-sink.service
+        systemctl start iiot-to-sink.service
         echo Installation complete!
+        echo
+        echo Checking status...
+        systemctl status iiot-to-sink.service
     else
         echo Installation not currently supported on environments without systemd
         exit 2
@@ -49,11 +52,11 @@ installservice() {
 }
 
 removeservice() {
-    UNIT_PATH=/etc/systemd/system/mqtt-to-sink
+    UNIT_PATH=/etc/systemd/system/iiot-to-sink
     if [ $(which systemctl) ]; then
       if [ -f "$UNIT_PATH"".service" ]; then
-         systemctl stop mqtt-to-sink.service
-         systemctl disable mqtt-to-sink.service
+         systemctl stop iiot-to-sink.service
+         systemctl disable iiot-to-sink.service
          rm "$UNIT_PATH"".service"
          systemctl daemon-reload
          echo Service removed!

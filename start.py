@@ -1,14 +1,10 @@
 import json
-import yaml
+from common import utils
 from sources import frommqtt
 from sources import fromopcua
 from sinks import sinkadapters
 
-name="Jon is cool"
-
-# Load config
-with open('config.yml', 'r') as file:
-    config = yaml.safe_load(file)
+config = utils.load_config()
 
 # Determine source
 mqttsource = frommqtt.mqttsource()

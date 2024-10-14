@@ -1,4 +1,3 @@
-import yaml
 import json
 import paho.mqtt
 import paho.mqtt.client as mqtt
@@ -10,9 +9,7 @@ class mqttsource():
         print ("Loaded MQTT Source")
         pass
     
-    # Load config
-    with open('config.yml', 'r') as file:
-        config = yaml.safe_load(file)
+    config = utils.load_config()
 
     # Remember all subscriptions
     mqtt_subscriptions = config['source']['mqtt']['subscriptions']
@@ -70,11 +67,16 @@ class mqttsource():
             for config_sink in config_sinks:
                 for sink in self.sinkadapters.sinks:
                     if sink.name.lower() == config_sink.lower():
-                        sinkparam = msg_sub["sinkparam"]
-                        if isinstance(sinkparam, list):
-                            sinkparam = sinkparam[i]
-                        print (f"Sending {value} to {sink.name} with params: {sinkparam}")
-                        print(' ', end='')
+                        sinkparam = None
+                        if "sinkparam" in msg_sub:
+                            sinkparam = msg_sub["sinkparam"]
+                            if isinstance(sinkparam, list):
+                                sinkparam = sinkparam[i]
+                            print (f"Sending {value} to {sink.name} with params: {sinkparam}")
+                            print(' ', end='')
+                        else:
+                            print (f"Sending {value} to {sink.name}")
+                            print(' ', end='')
                         sink.write(sink, utils.make_datetime_utc(), value, sinkparam, msg_sub)
                 i = i + 1
             print("=== Done processing message")

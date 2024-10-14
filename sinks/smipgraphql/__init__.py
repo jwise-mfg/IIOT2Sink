@@ -1,5 +1,5 @@
 import sinks
-import yaml
+from common import utils
 import json
 import requests
 from sinks.smipgraphql.smip import graphql
@@ -7,10 +7,7 @@ from sinks.smipgraphql.smip import graphql
 class smipgraphql(sinks.sinkadapters):
 
     name = "smipgraphql"
-    # Load self.config
-    # TODO: It would be nice if this could be passed into the sink constructor somehow...
-    with open('config.yml', 'r') as file:
-        config = yaml.safe_load(file)
+    config = utils.load_config()
 
     def __init__(self):
         pass

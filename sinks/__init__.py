@@ -1,13 +1,12 @@
 import os
-import yaml
+from common import utils
 import traceback
 from importlib import util
 from abc import ABC, abstractmethod
 # Adapted from: https://gist.github.com/dorneanu/cce1cd6711969d581873a88e0257e312
 
 # Load config
-with open('config.yml', 'r') as file:
-    config = yaml.safe_load(file)
+config = utils.load_config()
 
 # Base sink adapter resource class. Concrete resources will inherit from this one
 class sinkadapters:

@@ -1,5 +1,5 @@
 import sinks
-import yaml
+from common import utils
 import mysql
 import mysql.connector
 from datetime import datetime
@@ -7,12 +7,9 @@ import calendar
 
 class mysqlsink(sinks.sinkadapters):
 
-    # Load config
-    # TODO: It would be nice if this could be passed into the sink constructor somehow...
-    with open('config.yml', 'r') as file:
-        config = yaml.safe_load(file)
-
     name = "mysqlsink"
+    config = utils.load_config()
+
     host = config['sinks']['mysqlsink']['host']
     database = config['sinks']['mysqlsink']['database']
     dbuser = config['sinks']['mysqlsink']['user']
