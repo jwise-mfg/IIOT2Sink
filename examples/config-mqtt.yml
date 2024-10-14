@@ -25,7 +25,7 @@ source:
         sink: "mysqlsink"
         sinkparam: "insert into tag_samples (timestamp, value, label) values (%s, %s, %s)"
       # This is a complex subscription that parses a member of a payload and sends it to multiple sinks
-      # Sinks there are an array of sinks, there is also an array of sinkparams
+      # Since there are an array of sinks, there is also an array of sinkparams
       #   The first empty string means no param is needed
       #   The second string is the command for the second sink: a database insert
       #   The third sinkparam is an ID used for a mutation into the CESMII SMIP/ThinkIQ

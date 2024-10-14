@@ -1,4 +1,5 @@
 import yaml
+from asyncua import ua, Server
 
 class opcuasource():
 
