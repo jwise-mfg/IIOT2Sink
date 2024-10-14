@@ -20,15 +20,15 @@ class smipgraphql(sinks.sinkadapters):
 
     def write(self, timestamp, value, sinkparam, subscription):
         if subscription['sinkparam'] != None and subscription['sinkparam'] != "":
-            print(f"Sending to {self.config['sinks']['smipgraphql']['url']}: {value}")
+            print(f"Mutating into {self.config['sinks']['smipgraphql']['url']}: {value}")
             self.update_smip(self, timestamp, sinkparam, value)
         else:
             print(f"{self.name} invoked without parameters. Nothing to do!")
 
     #TODO: SMIP is type-safe, MQTT is not, what do we do...
     def update_smip(self, currtime, currid, currvalue):
-        print(f"self.name is {self.name}")
-        smipconn = graphql(self.config['sinks']['smipgraphql']['authenticator'], self.config['sinks']['smipgraphql']['password'], self.config['sinks']['smipgraphql']['username'], self.config['sinks']['smipgraphql']['role'], self.config['sinks']['smipgraphql']['url'])
+        config = self.config['sinks']['smipgraphql']
+        smipconn = graphql(config['authenticator'], config['password'], config['username'], config['role'], config['url'], config['verbose'])
         smp_query = f"""
                     mutation updateTimeSeries {{
                     replaceTimeSeriesRange(
@@ -45,6 +45,9 @@ class smipgraphql(sinks.sinkadapters):
         except requests.exceptions.HTTPError as e:
             print("An error occured accessing the SM Platform!")
             print(e)
-            
-        print("Response from SM Platform was...")
-        print(json.dumps(smp_response, indent=2))
+        
+        if config['verbose'] == True:
+            print("Response from SM Platform was...")
+            print(json.dumps(smp_response, indent=2))
+        else:
+            print("SMIP Update Complete")

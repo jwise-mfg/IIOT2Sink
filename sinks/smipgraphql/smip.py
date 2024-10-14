@@ -6,8 +6,9 @@ class graphql:
 
     current_bearer_token = None
     args = None
+    verbose = True
 
-    def __init__(self, authenticator, password, username, role, endpoint):
+    def __init__(self, authenticator, password, username, role, endpoint, verbose):
         self.parser = None
 
         self.parser = argparse.ArgumentParser()
@@ -17,6 +18,7 @@ class graphql:
         self.parser.add_argument("-r", "--role", type=str, default=role)
         self.parser.add_argument("-u", "--url", type=str, default=endpoint)
         graphql.args = self.parser.parse_args()
+        graphql.verbose = verbose
 
     def post(self, content):
         if graphql.current_bearer_token == None:
@@ -25,7 +27,8 @@ class graphql:
             response = self.perform_graphql_request(self, content)
         except requests.exceptions.HTTPError as e:
             if "forbidden" in str(e).lower() or "unauthorized" in str(e).lower():
-                print ("Not authorized, getting new token...")
+                if graphql.verbose == True:
+                    print ("Not authorized, getting new token...")
                 graphql.current_bearer_token = self.get_bearer_token(self)
                 response = self.perform_graphql_request(self, content)
             else:
@@ -35,9 +38,10 @@ class graphql:
         return response
 
     def perform_graphql_request(self, content, auth=False):
-        print("Performing request with content: ")
-        print(content)
-        print()
+        if graphql.verbose == True:
+            print("Performing request with content: ")
+            print(content)
+            print()
         if auth == True:
             header=None
         else:
@@ -59,12 +63,14 @@ class graphql:
                 }}
             """, True) 
         jwt_request = response['data']['authenticationRequest']['jwtRequest']
-        print ("got auth request response")
+        if graphql.verbose == True:
+            print ("got auth request response")
         if jwt_request['challenge'] is None:
             print ("no challenge in response")
             raise requests.exceptions.HTTPError(jwt_request['message'])
         else:
-            print("Challenge received: " + jwt_request['challenge'])
+            if graphql.verbose == True:
+                print("Challenge received: " + jwt_request['challenge'])
             response=self.perform_graphql_request(self, f"""
                 mutation authValidation {{
                 authenticationValidation(
