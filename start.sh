@@ -1,6 +1,19 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+purgevenv() {
+    rm -rf bin lib lib64 pyvenv.cfg
+}
+
 echo Starting IIOT2Sink
+echo ==================
+
+if [ "$1" == "--clean" ]; then
+    echo -n Cleaning virtual environment...
+    purgevenv
+    echo OK
+fi
+
 echo -n "Checking environment..."
 if command -v python3 >/dev/null 2>&1 ; then
     if [ ! -f config.yml ]; then
@@ -10,7 +23,9 @@ if command -v python3 >/dev/null 2>&1 ; then
     else
         echo "OK"
         echo -n "Loading configuration."
-        python3 -m venv .
+        if [ ! -f pyvenve.cfg ]; then
+            python3 -m venv .
+        fi
         echo -n "."
         source $SCRIPT_DIR/bin/activate
         echo ".OK"
