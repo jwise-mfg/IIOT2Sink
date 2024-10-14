@@ -16,7 +16,7 @@ Note that while you can have multiple sinks in use at one time, you can only hav
 ## Run
 
 ### Easy (Hopefully Just Works)
-- Start by executing the `start.sh` scrip
+- Start by executing the `start.sh` script
 
 ### Manual (Do this if you want to tinker/edit/extend)
 - Create a python3 virtual environment in this folder: `python3 -m venv .`
@@ -26,9 +26,7 @@ Note that while you can have multiple sinks in use at one time, you can only hav
 - Run `python3 start.py`
 
 ### Clean Run
-- If you move or rename the project folder, you make find your venv doesn't work any more. This can easily be fixed with a clean run:
-
-`start.sh --clean`
+- If you move or rename the project folder, you make find your venv doesn't work any more. This can easily be fixed with a clean run: `start.sh --clean`
 
 ## Install as a Service
 
