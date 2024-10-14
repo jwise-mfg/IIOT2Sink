@@ -42,38 +42,44 @@ class mqttsource():
         else:
             # Check if the payload contains the configured member and parse out its avlue
             print ("Searching for JSON payload member: " + msg_sub["member"])
-            data = json.loads(msg)
-            #TODO: error handling
-            member_parts = msg_sub["member"].split(".")
-            for member in member_parts:
-                data = self.search_json(data, member)
-            value = data
-            print ("Discovered value:", value)
+            try:
+                data = json.loads(msg)
+                member_parts = msg_sub["member"].split(".")
+                for member in member_parts:
+                    data = self.search_json(data, member)
+                value = data
+                print ("Parsed value:", value)
+            except Exception as e:
+                print ("Could not parse MQTT Payload!")
+                print (e)
+                value = None
 
         # TODO: option to not post duplicate values
-
-        # Check if we have a place to send the data
-        if isinstance(msg_sub["sink"], list):
-            print ("Using multiple sinks:", json.dumps(msg_sub["sink"]))
+        if value != None:
+            # Check if we have a place to send the data
+            if isinstance(msg_sub["sink"], list):
+                print ("Using multiple sinks:", json.dumps(msg_sub["sink"]))
+            else:
+                print ("Using sink: ", msg_sub["sink"])
+            
+            # Check if that requested sink adapter exists and write to it
+            config_sinks = msg_sub["sink"]
+            if not isinstance(config_sinks, list):
+                config_sinks = [msg_sub["sink"]]
+            i = 0
+            for config_sink in config_sinks:
+                for sink in self.sinkadapters.sinks:
+                    if sink.name.lower() == config_sink.lower():
+                        sinkparam = msg_sub["sinkparam"]
+                        if isinstance(sinkparam, list):
+                            sinkparam = sinkparam[i]
+                        print (f"Sending {value} to {sink.name} with params: {sinkparam}")
+                        print(' ', end='')
+                        sink.write(sink, utils.make_datetime_utc(), value, sinkparam, msg_sub)
+                i = i + 1
+            print("=== Done processing message")
         else:
-            print ("Using sink: ", msg_sub["sink"])
-        
-        # Check if that requested sink adapter exists and write to it
-        config_sinks = msg_sub["sink"]
-        if not isinstance(config_sinks, list):
-            config_sinks = [msg_sub["sink"]]
-        i = 0
-        for config_sink in config_sinks:
-            for sink in self.sinkadapters.sinks:
-                if sink.name.lower() == config_sink.lower():
-                    sinkparam = msg_sub["sinkparam"]
-                    if isinstance(sinkparam, list):
-                        sinkparam = sinkparam[i]
-                    print (f"Sending {value} to {sink.name} with params: {sinkparam}")
-                    print(' ', end='')
-                    sink.write(sink, utils.make_datetime_utc(), value, sinkparam, msg_sub)
-            i = i + 1
-        print("=== Done processing message")
+            print("=== Failed processing message")
 
     def connect(self, sinkadapters):
         # Connect to MQTT Broker (handle different library versions)
