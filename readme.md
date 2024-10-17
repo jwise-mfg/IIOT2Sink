@@ -26,7 +26,7 @@ Note that while you can have multiple sinks in use at one time, you can only hav
 - Run `python3 start.py`
 
 ### Clean Run
-- If you move or rename the project folder, you make find your venv doesn't work any more. This can easily be fixed with a clean run: `start.sh --clean`
+- If you move or rename the project folder, you may find your venv doesn't work any more. This can easily be fixed with a clean run: `start.sh --clean`
 
 ## Install as a Service
 
