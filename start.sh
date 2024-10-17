@@ -5,6 +5,7 @@ purgevenv() {
     rm -rf bin lib lib64 include pyvenv.cfg
 }
 
+echo
 echo Starting IIOT to Sink
 echo =====================
 
