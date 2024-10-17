@@ -2,7 +2,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 purgevenv() {
-    rm -rf bin lib lib64 inclue pyvenv.cfg
+    rm -rf bin lib lib64 include pyvenv.cfg
 }
 
 echo Starting IIOT to Sink
