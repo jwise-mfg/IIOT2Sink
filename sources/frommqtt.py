@@ -78,7 +78,7 @@ class mqttsource():
                             print (f"Sending {value} to {sink.name}")
                             print(' ', end='')
                         sink.write(sink, utils.make_datetime_utc(), value, sinkparam, msg_sub)
-                i = i + 1
+                i += 1
             print("=== Done processing message")
         else:
             print("=== Failed processing message")

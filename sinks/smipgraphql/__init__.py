@@ -7,6 +7,8 @@ from sinks.smipgraphql.smip import graphql
 class smipgraphql(sinks.sinkadapters):
 
     name = "smipgraphql"
+    batch_mutations = ""
+    batch_items = 0
     config = utils.load_config()
 
     def __init__(self):
@@ -17,31 +19,23 @@ class smipgraphql(sinks.sinkadapters):
 
     def write(self, timestamp, value, sinkparam, subscription):
         if subscription['sinkparam'] != None and subscription['sinkparam'] != "":
-            print(f"Mutating into {self.config['sinks']['smipgraphql']['url']}: {value}")
             self.update_smip(self, timestamp, sinkparam, value)
         else:
             print(f"{self.name} invoked without parameters. Nothing to do!")
 
     #TODO: SMIP is type-safe, MQTT is not, what do we do...
-    def update_smip(self, currtime, currid, currvalue):
+    def update_smip(self, timestamp, currid, currvalue):
         config = self.config['sinks']['smipgraphql']
         smipconn = graphql(config['authenticator'], config['password'], config['username'], config['role'], config['url'], config['verbose'])
-        smp_query = f"""
-                    mutation updateTimeSeries {{
-                    replaceTimeSeriesRange(
-                        input: {{attributeOrTagId: "{currid}", entries: [ {{timestamp: "{currtime}", value: "{currvalue}", status: "0"}} ] }}
-                        ) {{
-                        clientMutationId,
-                        json
-                    }}
-                    }}
-                """
-        smp_response = ""
-        try:
-            smp_response = graphql.post(graphql, smp_query)
-        except requests.exceptions.HTTPError as e:
-            print("An error occured accessing the SM Platform!")
-            print(e)
+        self.batch_items += 1
+        self.batch_mutations += graphql.build_alias_ts_mutation(graphql, timestamp, self.batch_items, currid, currvalue)
+        if (self.batch_items >= config['batchuntil']):
+            print(f"Posting batch of {config['batchuntil']} mutations to {config['url']}")
+            smp_response = graphql.multi_tsmutate_aliases(graphql, self.batch_mutations)
+            self.batch_items = 0
+            self.batch_mutations = ""
+        else:
+            print(f"Mutation batched ({self.batch_items} of {config['batchuntil']})")
         
         if config['verbose'] == True:
             print("Response from SM Platform was...")

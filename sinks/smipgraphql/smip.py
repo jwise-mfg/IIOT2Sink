@@ -82,3 +82,32 @@ class graphql:
             """, True)
         jwt_claim = response['data']['authenticationValidation']['jwtClaim']
         return f"Bearer {jwt_claim}"
+
+    def build_alias_ts_mutation(self, timestamp, ordinal, attributeOrTagId, value):
+        smp_mutation = f'''ts{ordinal}: replaceTimeSeriesRange (
+                                input: {{
+                                        entries: [
+                                                {{ status: "0", timestamp: "{timestamp}", value: "{value}" }}
+                                        ]
+                                        attributeOrTagId: "{attributeOrTagId}"
+                                }}) {{
+                                        json
+                                }}
+                                '''
+        return smp_mutation
+
+    def multi_tsmutate_aliases(self, aliasmutations):
+            smp_mutation = f'''mutation tsmulti {{
+                                    {aliasmutations}
+                            }}
+                            '''		
+            smp_response = ""
+            try:
+                    smp_response = self.post(self, smp_mutation)
+                    if 'errors' in smp_response:
+                            print("\033[31mThe SM Platform returned an error during a write operation:\033[0m")
+                            print(smp_response['errors'])
+                    return smp_response
+            except requests.exceptions.HTTPError as e:
+                    print("\033[31mAn error occured writing to the SM Platform:\033[0m")
+                    print(e)
