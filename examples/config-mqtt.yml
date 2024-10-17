@@ -52,3 +52,4 @@ sinks:
     password: "YOUR AUTHENTICATOR PASSWORD"
     username: "YOUR USERNAME"
     batchuntil: 10
+    verbose: False
