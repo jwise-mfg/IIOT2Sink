@@ -20,6 +20,7 @@ class mysqlsink(sinks.sinkadapters):
 
     def start(self):
         print(f"Starting {self.name} using database: {self.host}.{self.database}")
+        #TODO: Test connectivity on startup
 
     def write(self, timestamp, value, sinkparam, subscription):
         if subscription["sinkparam"] != None and subscription["sinkparam"] != "":

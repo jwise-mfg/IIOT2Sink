@@ -4,8 +4,9 @@ set SCRIPT_DIR=%~dp0
 echo Starting IIOT to Sink
 echo =====================
 
-if [%1]==["--clean"] goto purgevenv
+if [%1]==[--clean] goto purgevenv
 
+:dostart
 echo|set /p="Checking environment..."
 python --version >NUL  2>NUL
 IF %ERRORLEVEL% NEQ 0 (
@@ -21,7 +22,9 @@ if not exist "%SCRIPT_DIR%config.yml" (
 echo OK
 echo|set /p="Loading configuration."
 if exist "%SCRIPT_DIR%config.yml" (
+    copy "%SCRIPT_DIR%%.gitignore" "%%SCRIPT_DIR%%gitignore.bak"
     python -m venv .
+    move "%%SCRIPT_DIR%%gitignore.bak" "%SCRIPT_DIR%%.gitignore" /y
 )
 echo|set /p="."
 call "%SCRIPT_DIR%Scripts\activate.bat"
@@ -42,8 +45,10 @@ echo Starting main loop...
 exit /B 0
 
 :purgevenv
-    rmdir /s /q %SCRIPT_DIR%/Scripts
-    rmdir /s /q %SCRIPT_DIR%/Lib
-    rmdir /s /q %SCRIPT_DIR%/Include
-    del /f /q pyvenv.cfg
+    echo|set /p="Cleaning virtual environment..."
+    rmdir /s /q %SCRIPT_DIR%/Scripts >NUL  2>NUL
+    rmdir /s /q %SCRIPT_DIR%/Lib >NUL  2>NUL
+    rmdir /s /q %SCRIPT_DIR%/Include >NUL  2>NUL
+    del /f /q pyvenv.cfg >NUL  2>NUL
     echo OK
+    goto dostart

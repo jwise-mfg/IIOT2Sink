@@ -24,7 +24,9 @@ if command -v python3 >/dev/null 2>&1 ; then
         echo "OK"
         echo -n "Loading configuration."
         if [ ! -f $SCRIPT_DIR/pyvenv.cfg ]; then
+            cp $SCRIPT_DIR/.gitignore $SCRIPT_DIR/gitignore.bak
             python3 -m venv .
+            mv $SCRIPT_DIR/gitignore.bak $SCRIPT_DIR/.gitignore
         fi
         echo -n "."
         source $SCRIPT_DIR/bin/activate
