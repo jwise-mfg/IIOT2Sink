@@ -34,7 +34,7 @@ sinks:
     database: "YOURDB"
     user: "YOURDBUSER"
     password: "YOURDBPASSWORD"
-  smip:
+  smipgraphql:
     url: "https://<YOURINSTANCE>.cesmii.net/graphql"
     authenticator: "YOUR AUTHENTICATOR"
     role: "<YOUR>_group"
