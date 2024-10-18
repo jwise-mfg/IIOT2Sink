@@ -15,10 +15,14 @@ Note that while you can have multiple sinks in use at one time, you can only hav
 
 ## Run
 
-### Easy (Hopefully Just Works)
+### Easy on Linux or Mac (Hopefully Just Works)
 - Start by executing the `start.sh` script
 
-### Manual (Do this if you want to tinker/edit/extend)
+### Easy on Windows
+- Launch a PowerShell window
+- Execute `start.bat`
+
+### Manual (If you want to tinker/edit/extend on any OS)
 - Create a python3 virtual environment in this folder: `python3 -m venv .`
 - Activate the environment: `source bin/activate`
 - Install the dependencies:
