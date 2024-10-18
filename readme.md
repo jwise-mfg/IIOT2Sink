@@ -1,6 +1,7 @@
 # IIOT to Sink
 
 Its harder than it should be to get a lot of Industrial IoT messages into somewhere you can use them. This attempts to fix that. Supports MQTT with simple parsing of JSON payloads, OPCUA Client/Server (coming soon!) and a variety of destinations (called sinks) to send the data too. Sinks are extensible, and new ones can easily be added.
+Hi Suellen.
 
 ## Requirements
 
