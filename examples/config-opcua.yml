@@ -1,5 +1,6 @@
 # This is an example config file. It cannot be used directly.
 # Copy this file to the project root as config.yml and make the changes necessary for your environment.
+# If you specify multiple sources, only the first one will be used
 # If you omit a sink, it will not be loaded.
 source:
   opcua:

@@ -20,5 +20,7 @@ if __name__ == '__main__':
         print('-', end='')
         inst.start()
 
-if source == "mqtt":
+if source == "mqtt" and "mqtt" in config['source']:
     mqttsource.connect(sinkadapters)
+if source == "opcua" and "opcua" in config['source']:
+    opcua.connect(sinkadapters)
