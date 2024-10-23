@@ -1,14 +1,14 @@
 import json
 from common import utils
 from sources import frommqtt
-from sources import fromopcua
+#from sources import fromopcua
 from sinks import sinkadapters
 
 config = utils.load_config()
 
 # Determine source
 mqttsource = frommqtt.mqttsource()
-opcuasource = fromopcua.opcuasource()
+#opcuasource = fromopcua.opcuasource()
 source = list(config['source'].keys())[0]
 print ("-Using source:", str(source))
 
@@ -22,5 +22,5 @@ if __name__ == '__main__':
 
 if source == "mqtt" and "mqtt" in config['source']:
     mqttsource.connect(sinkadapters)
-if source == "opcua" and "opcua" in config['source']:
-    opcua.connect(sinkadapters)
+#if source == "opcua" and "opcua" in config['source']:
+#    opcua.connect(sinkadapters)

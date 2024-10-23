@@ -19,8 +19,6 @@ class log2csv(sinks.sinkadapters):
         print(f"Starting {self.name} using log file: {self.logpath}")
 
     def write(self, timestamp, value, sinkparam, subscription):
-        if not os.path.exists(self.logpath):
-            with open(self.logpath, 'w'): pass
         if os.path.getsize(self.logpath) > self.maxsize:
             if self.maxflush == True:
                 print(f"Log file at {self.logpath} exceeded max size of {self.maxsize} bytes and has been flushed!")
@@ -28,7 +26,7 @@ class log2csv(sinks.sinkadapters):
             else:
                 print(f"Log file at {self.logpath} exceeds max size of {self.maxsize} bytes and is not configured to flush. Cannot log {value}.")
                 return
-        with open(self.logpath, 'a') as f:
+        with open(self.logpath, 'a+') as f:
             value = str(value)
             print (f"Logging to {self.logpath}: {value}")
             f.write(timestamp + "," + subscription["label"] + "," + str(value) + "\r\n")
